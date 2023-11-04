@@ -40,10 +40,14 @@ fun ClassificationDiseasesScreen(
     searcher: Boolean,
 ) {
     val viewModel: DiseasesViewModel = hiltViewModel()
-    val categories by viewModel.diseasesWithChildren.collectAsState()
+    val diseasesState by viewModel.diseasesStandState.collectAsState()
     Column {
         if (searcher)
-            SearchView({})
+            SearchView(
+                diseasesState.searchContent,
+                viewModel::searchDiseases,
+                viewModel::changeContent
+            )
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -51,7 +55,7 @@ fun ClassificationDiseasesScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(8.dp),
         ) {
-            items(categories) { item ->
+            items(diseasesState.diseases) { item ->
 
                 Box(
                     modifier = Modifier.fillMaxWidth(),

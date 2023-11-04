@@ -36,9 +36,8 @@ object MainModule {
         }
 
         return Room.databaseBuilder(app, AppDatabase::class.java, "diseases.db")
-            .addCallback(roomCallback)
-//            .createFromAsset("diseases.db")
-//            .fallbackToDestructiveMigration()
+//            .addCallback(roomCallback)
+            .createFromAsset("diseases.db")
             .build()
     }
 

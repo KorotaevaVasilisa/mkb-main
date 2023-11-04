@@ -19,9 +19,8 @@ interface DiseasesDao {
     @Transaction
     @Query("SELECT * FROM diseases WHERE parent_id =:id")
     suspend fun getDiseasesWithChildren(id: Int): List<DiseasesWithChildren>
-//
-//    @Query("SELECT * FROM diseases JOIN diseasesFts "+
-//    "ON diseases.id == diseasesFts.rowid WHERE diseasesFts.mkb_name "+
-//    "MATCH :search")
-//    suspend fun filtered(search: String): List<DiseasesEntity>
+
+    @Transaction
+    @Query("SELECT * FROM diseases WHERE mkb_name LIKE '%' || :name || '%'")
+    suspend fun searchDiseases(name: String): List<DiseasesWithChildren>
 }
