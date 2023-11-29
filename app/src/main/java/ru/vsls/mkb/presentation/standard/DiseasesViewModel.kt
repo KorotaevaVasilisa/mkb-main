@@ -39,7 +39,10 @@ class DiseasesViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val data = repository.searchDiseases(name)
             _diseasesStandState.update {
-                it.copy(diseases = data)
+                it.copy(
+                    diseases = data,
+                    confirmedSearchString = name
+                )
             }
         }
     }
@@ -48,5 +51,15 @@ class DiseasesViewModel @Inject constructor(
         _diseasesStandState.update {
             it.copy(searchContent = value)
         }
+    }
+
+    fun changeSearchContent() {
+        _diseasesStandState.update {
+            it.copy(
+                searchContent = "",
+                confirmedSearchString = ""
+            )
+        }
+        getAllDiseasesFromDatabaseWithChildren()
     }
 }

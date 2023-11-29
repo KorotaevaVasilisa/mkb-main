@@ -40,7 +40,10 @@ class TreeViewModel @Inject constructor(
             val data = repository.searchDiseases(name)
             val tree = data.map { it.mapToUiModel() }
             _diseasesTreeState.update {
-                it.copy(tree = tree)
+                it.copy(
+                    tree = tree,
+                    confirmedSearchString = name
+                )
             }
         }
     }
@@ -107,5 +110,15 @@ class TreeViewModel @Inject constructor(
         _diseasesTreeState.update {
             it.copy(searchContent = value)
         }
+    }
+
+    fun changeSearchContent() {
+        _diseasesTreeState.update {
+            it.copy(
+                searchContent = "",
+                confirmedSearchString = ""
+            )
+        }
+        getAllDiseasesFromDatabaseWithChildren()
     }
 }

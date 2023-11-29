@@ -20,6 +20,12 @@ fun TreeScreen(
                 viewModel::searchDiseases,
                 viewModel::changeContent
             )
-        ClassificationTreeView(diseasesTreeState.tree, viewModel::loadChildren)
+        else
+            viewModel.changeSearchContent()
+        ClassificationTreeView(
+            diseasesTreeState.tree,
+            diseasesTreeState.confirmedSearchString,
+            viewModel::loadChildren
+        )
     }
 }

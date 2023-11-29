@@ -5,4 +5,5 @@ import ru.vsls.mkb.presentation.models.ClassificationTreeModel
 data class DiseasesTreeState(
     val tree: List<ClassificationTreeModel> = emptyList(),
     val searchContent: String = "",
+    val confirmedSearchString: String = ""
 )

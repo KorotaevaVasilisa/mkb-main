@@ -17,7 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,6 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import ru.vsls.mkb.R
 import ru.vsls.mkb.presentation.components.SearchView
+import ru.vsls.mkb.presentation.getAnnotatedString
 import ru.vsls.mkb.presentation.navigation.Screen
 
 @Composable
@@ -48,6 +48,8 @@ fun ClassificationDiseasesScreen(
                 viewModel::searchDiseases,
                 viewModel::changeContent
             )
+        else
+            viewModel.changeSearchContent()
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -62,9 +64,11 @@ fun ClassificationDiseasesScreen(
                 ) {
                     val modifier = Modifier.fillMaxWidth()
                     ItemList(
-                        item.disease.mkbName,
-                        item.disease.mkbCode,
-                        item.children.isNotEmpty(),
+                        mkbName = item.disease.mkbName,
+                        mkbCode = item.disease.mkbCode,
+                        hasChildren = item.children.isNotEmpty(),
+                        confirmedSearchString = diseasesState.confirmedSearchString,
+                        searcherContent = diseasesState.searchContent,
                         onClick = {
                             if (item.children.isNotEmpty())
                                 navController.navigate(Screen.ClassificationScreen.route + "/${item.disease.id}")
@@ -77,23 +81,14 @@ fun ClassificationDiseasesScreen(
     }
 }
 
-@Preview()
-@Composable()
-fun ShowScreen() {
-    ItemList(
-        "Мочекаменная болезнь",
-        "N20-N23",
-        true,
-        {}
-    )
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemList(
     mkbName: String,
     mkbCode: String,
     hasChildren: Boolean,
+    confirmedSearchString: String,
+    searcherContent: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -116,7 +111,10 @@ fun ItemList(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
-                Text(text = mkbName, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                Text(
+                    text = getAnnotatedString(mkbName, confirmedSearchString),
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
             }
             if (hasChildren) {
                 Icon(
@@ -125,7 +123,19 @@ fun ItemList(
                     tint = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             }
-
         }
     }
+}
+
+@Preview()
+@Composable()
+fun ShowScreen() {
+    ItemList(
+        "Мочекаменная болезнь",
+        "N20-N23",
+        true,
+        "енн",
+        "",
+        {}
+    )
 }
