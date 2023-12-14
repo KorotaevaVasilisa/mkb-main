@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.vsls.mkb.domain.model.ClassificationWithChildrenModel
 import ru.vsls.mkb.domain.repositories.DatabaseRepository
 import javax.inject.Inject
 
@@ -19,9 +18,9 @@ class DiseasesViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val id: Int? = savedStateHandle["parentId"]
-    private val _diseasesWithChildren =
-        MutableStateFlow<List<ClassificationWithChildrenModel>>(emptyList())
-    val diseasesWithChildren = _diseasesWithChildren.asStateFlow()
+    private val _diseasesStandState =
+        MutableStateFlow(DiseasesStandardState())
+    val diseasesStandState = _diseasesStandState.asStateFlow()
 
     init {
         if (id != null) getAllDiseasesFromDatabaseWithChildren(id) else getAllDiseasesFromDatabaseWithChildren()
@@ -30,14 +29,37 @@ class DiseasesViewModel @Inject constructor(
     private fun getAllDiseasesFromDatabaseWithChildren(id: Int = 0) {
         viewModelScope.launch(Dispatchers.IO) {
             val data = repository.getDiseasesByParentId(id)
-            _diseasesWithChildren.update { data }
+            _diseasesStandState.update {
+                it.copy(diseases = data)
+            }
         }
     }
 
-//    fun getFoundMatches(text:String){
-//        viewModelScope.launch(Dispatchers.IO) {
-//            val data = repository.getSearchDiseases(text)
-//        }
-//    }
+    fun searchDiseases(name: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val data = repository.searchDiseases(name)
+            _diseasesStandState.update {
+                it.copy(
+                    diseases = data,
+                    confirmedSearchString = name
+                )
+            }
+        }
+    }
 
+    fun changeContent(value: String) {
+        _diseasesStandState.update {
+            it.copy(searchContent = value)
+        }
+    }
+
+    fun changeSearchContent() {
+        _diseasesStandState.update {
+            it.copy(
+                searchContent = "",
+                confirmedSearchString = ""
+            )
+        }
+        getAllDiseasesFromDatabaseWithChildren()
+    }
 }

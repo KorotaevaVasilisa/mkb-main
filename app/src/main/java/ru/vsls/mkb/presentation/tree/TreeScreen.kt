@@ -9,13 +9,23 @@ import ru.vsls.mkb.presentation.components.SearchView
 
 @Composable
 fun TreeScreen(
-    searcher:Boolean
+    searcher: Boolean,
 ) {
     val viewModel: TreeViewModel = hiltViewModel()
-    val diseasesTree by viewModel.diseasesTreeState.collectAsState()
+    val diseasesTreeState by viewModel.diseasesTreeState.collectAsState()
     Column() {
         if (searcher)
-            SearchView({})
-        ClassificationTreeView(diseasesTree.tree, viewModel::loadChildren)
+            SearchView(
+                diseasesTreeState.searchContent,
+                viewModel::searchDiseases,
+                viewModel::changeContent
+            )
+        else
+            viewModel.changeSearchContent()
+        ClassificationTreeView(
+            diseasesTreeState.tree,
+            diseasesTreeState.confirmedSearchString,
+            viewModel::loadChildren
+        )
     }
 }

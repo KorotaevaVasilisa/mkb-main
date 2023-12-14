@@ -17,22 +17,28 @@ import com.mr0xf00.lazytreelist.LazyTreeListScope
 
 @OptIn(ExperimentalLazyTreeListApi::class)
 @Composable
-fun ClassificationTreeView(treeModes: List<ClassificationTreeModel>, loadChildren: (Int) -> Unit) {
+fun ClassificationTreeView(
+    treeModes: List<ClassificationTreeModel>,
+    confirmedSearchString: String,
+    loadChildren: (Int) -> Unit,
+) {
     val expansionState = remember { ExpansionState() }
 
     LazyTreeList(
         modifier = Modifier
-            .fillMaxWidth().background(MaterialTheme.colorScheme.background),
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background),
         expansionState = expansionState,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(8.dp)
     ) {
-        generateTree(treeModes, loadChildren)
+        generateTree(treeModes, confirmedSearchString, loadChildren)
     }
 }
 
 fun LazyTreeListScope.generateTree(
     children: List<ClassificationTreeModel>,
+    confirmedSearchString: String,
     loadChildren: (Int) -> Unit,
 ) {
     items(
@@ -41,7 +47,7 @@ fun LazyTreeListScope.generateTree(
             children[index].id
         },
         subItems = { index ->
-            generateTree(children[index].children, loadChildren)
+            generateTree(children[index].children, confirmedSearchString, loadChildren)
         },
         itemContent = { index ->
             val content = children[index]
@@ -55,6 +61,7 @@ fun LazyTreeListScope.generateTree(
                         name = content.mkbName,
                         mkbCode = content.mkbCode,
                         isExpanded = isExpanded,
+                        confirmedSearchString = confirmedSearchString,
                         onExpand = {
                             if (content.children.isEmpty()) {
                                 loadChildren(content.id)
@@ -64,7 +71,12 @@ fun LazyTreeListScope.generateTree(
                         modifier = modifier
                     )
                 } else {
-                    LeafItem(name = content.mkbName, mkbCode = content.mkbCode, modifier = modifier)
+                    LeafItem(
+                        name = content.mkbName,
+                        mkbCode = content.mkbCode,
+                        confirmedSearchString = confirmedSearchString,
+                        modifier = modifier
+                    )
                 }
             }
         }

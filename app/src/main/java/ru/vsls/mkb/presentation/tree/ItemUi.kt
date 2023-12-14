@@ -14,7 +14,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import ru.vsls.mkb.presentation.getAnnotatedString
 
 @Composable
 inline fun DepthStyle(
@@ -39,7 +39,12 @@ inline fun DepthStyle(
 }
 
 @Composable
-fun LeafItem(name: String, mkbCode: String, modifier: Modifier = Modifier) {
+fun LeafItem(
+    name: String,
+    mkbCode: String,
+    confirmedSearchString: String,
+    modifier: Modifier = Modifier,
+) {
     Surface(
         modifier = modifier.heightIn(min = 50.dp),
         shape = RoundedCornerShape(8.dp),
@@ -57,7 +62,10 @@ fun LeafItem(name: String, mkbCode: String, modifier: Modifier = Modifier) {
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
-                Text(text = name, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                Text(
+                    text = getAnnotatedString(name, confirmedSearchString),
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
             }
         }
     }
@@ -66,15 +74,15 @@ fun LeafItem(name: String, mkbCode: String, modifier: Modifier = Modifier) {
 @Preview
 @Composable
 fun LeafItemPreview() {
-    LeafItem(mkbCode = "M41.9", name = "Сколиоз неуточненный")
+    LeafItem(mkbCode = "M41.9", name = "Сколиоз неуточненный", confirmedSearchString =  "оз")
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContainerItem(
     name: String,
     mkbCode: String,
     isExpanded: Boolean,
+    confirmedSearchString: String,
     onExpand: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -96,7 +104,10 @@ fun ContainerItem(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
-                Text(text = name, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                Text(
+                    text = getAnnotatedString(name, confirmedSearchString),
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
             }
             Icon(
                 if (!isExpanded) Icons.Default.KeyboardArrowRight

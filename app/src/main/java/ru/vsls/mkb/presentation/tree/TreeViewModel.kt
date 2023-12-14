@@ -35,6 +35,19 @@ class TreeViewModel @Inject constructor(
         }
     }
 
+    fun searchDiseases(name: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val data = repository.searchDiseases(name)
+            val tree = data.map { it.mapToUiModel() }
+            _diseasesTreeState.update {
+                it.copy(
+                    tree = tree,
+                    confirmedSearchString = name
+                )
+            }
+        }
+    }
+
     fun loadChildren(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             // получаем список из БД
@@ -63,18 +76,18 @@ class TreeViewModel @Inject constructor(
     private fun setBranchToTree(
         needleNodeId: Int,
         existTree: List<ClassificationTreeModel>,
-        newBranch: List<ClassificationTreeModel>
+        newBranch: List<ClassificationTreeModel>,
     ): List<ClassificationTreeModel> {
         val newTree = mutableListOf<ClassificationTreeModel>()
         for (node in existTree) {
-            if (node.id == needleNodeId){
+            if (node.id == needleNodeId) {
                 val newNodeWithChildren = node.copy(children = newBranch)
                 newTree += newNodeWithChildren
-            }else if(node.children.isNotEmpty()){
+            } else if (node.children.isNotEmpty()) {
                 val children = setBranchToTree(needleNodeId, node.children, newBranch)
                 val newNodeWithChildren = node.copy(children = children)
                 newTree += newNodeWithChildren
-            }else{
+            } else {
                 newTree += node
             }
         }
@@ -92,4 +105,20 @@ class TreeViewModel @Inject constructor(
             // в children будут загружены дочерние узлы
             children = emptyList()
         )
+
+    fun changeContent(value: String) {
+        _diseasesTreeState.update {
+            it.copy(searchContent = value)
+        }
+    }
+
+    fun changeSearchContent() {
+        _diseasesTreeState.update {
+            it.copy(
+                searchContent = "",
+                confirmedSearchString = ""
+            )
+        }
+        getAllDiseasesFromDatabaseWithChildren()
+    }
 }
